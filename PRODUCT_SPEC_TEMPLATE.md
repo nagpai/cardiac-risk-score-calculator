@@ -1,18 +1,33 @@
 # Cardiac Risk Score Calculator - Product Specification Template
 
 ## 1. Product Overview
-**Status**: [DRAFT/IN_REVIEW/APPROVED]  
+**Status**: Approved  
 **Version**: 1.0  
-**Last Updated**: [DATE]
+**Last Updated**: August 8, 2025
 
 ### Executive Summary
-[Brief 2-3 sentence summary of the application]
+A web-based application that calculates cardiovascular risk using the proven Framingham Risk Score formula. The calculator helps users assess their 10-year risk of experiencing a cardiac event based on clinical parameters.
 
 ### Problem Statement
-[Describe the problem this calculator solves]
+The app helps in preventive healthcare decisions by providing a quick assessment of a patient's cardiovascular risk. It is particularly useful for individuals, researchers, and healthcare professionals to make informed decisions about their patients' health.
+
+This is an indicative tool and not a substitute for professional medical advice.
 
 ### Solution Overview
-[High-level description of how the app addresses the problem]
+The app uses the Framingham Risk Score formula to calculate cardiovascular risk. It provides a user-friendly interface for inputting clinical parameters and displays the calculated risk score and associated information.
+
+### Key Features
+- **Risk Calculation Engine**: Implements the Framingham Risk Score algorithm for 10-year risk calculations.
+- **Data Input Interface**: Allows users to input clinical parameters such as age, gender, cholesterol levels, blood pressure, smoking status, diabetes status, family history, and current medications.
+- **Measurement units**: Allows users to input measurements in mg/DL or mmol/L. The calculator will provide a switch for selection of units and automatically convert to the required units.
+- **Results Display**: Displays the calculated risk score, risk category, and provides visual representations of the risk.
+- **Educational Content**: Provides explanations and recommendations based on risk factors and prevention strategies.
+- **Data Management**: Allows users to save and load patient profiles locally and export results as a PDF.
+- **Performance**: Results are calculated within 100ms.
+- **Accessibility**: WCAG 2.1 AA compliance.
+- **Browser Support**: Works on Chrome, Firefox, Safari, and Edge (last 2 versions).
+- **Mobile Responsive**: Works on tablets and phones.
+- **Data Privacy**: No data is sent to external servers.
 
 ---
 
@@ -21,7 +36,7 @@
 ### Primary User Stories
 - [ ] **As a healthcare professional**, I want to quickly assess a patient's cardiovascular risk so that I can make informed treatment decisions
 - [ ] **As an individual**, I want to understand my heart disease risk so that I can take preventive measures
-- [ ] **As a researcher**, I want to use standardized risk calculations so that my data is comparable to other studies
+- [ ] **As a researcher**, I want to use standardized risk calculations so that my data is comparable to other studies 
 
 ### Functional Requirements
 
@@ -84,10 +99,10 @@
 interface PatientData {
   age: number;                    // 30-79 years
   gender: 'male' | 'female';
-  totalCholesterol: number;       // mg/dL
-  hdlCholesterol: number;         // mg/dL
-  systolicBP: number;            // mmHg
-  diastolicBP: number;           // mmHg
+  totalCholesterol: number;       // mg/dL or mmol/L
+  hdlCholesterol: number;         // mg/dL or mmol/L
+  systolicBP: number;            // mmHg or mmol/L
+  diastolicBP: number;           // mmHg or mmol/L
   isSmoker: boolean;
   hasDiabetes: boolean;
   familyHistory: boolean;

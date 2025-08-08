@@ -47,3 +47,4 @@ src/
 - Implement proper error boundaries for medical calculations
 - Use controlled components for all form inputs
 - Maintain clear separation between data validation and business logic
+- Ensure web security best practices are followed
