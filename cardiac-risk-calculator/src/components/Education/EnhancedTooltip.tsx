@@ -27,7 +27,7 @@ export const EnhancedTooltip: React.FC<EnhancedTooltipProps> = ({
   const [isVisible, setIsVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [showDetailed, setShowDetailed] = useState(false);
-  const timeoutRef = useRef<number | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const { announceToScreenReader } = useAccessibilityContext();
 

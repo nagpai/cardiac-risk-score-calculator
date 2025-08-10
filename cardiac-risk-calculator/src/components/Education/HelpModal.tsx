@@ -14,7 +14,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({
   topic = 'general' 
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
-  const { focusFirst, trapFocus } = useFocusManagement(modalRef);
+  const { focusFirst, trapFocus } = useFocusManagement(modalRef as React.RefObject<HTMLElement>);
 
   useEffect(() => {
     if (isOpen) {
@@ -354,7 +354,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title="Help & Information"
-      size="large"
+      size="xl"
     >
       <div 
         ref={modalRef}

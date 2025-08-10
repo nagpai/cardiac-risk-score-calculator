@@ -12,10 +12,19 @@ import {
  * Custom hook for form validation with React Hook Form integration
  */
 export const useFormValidation = <T extends Record<string, any> = PatientData>() => {
+  const defaultValues = {
+    cholesterolUnit: 'mg/dL',
+    onBPMedication: false,
+    glucoseUnit: 'mg/dL',
+    smokingStatus: 'never',
+    hasDiabetes: false,
+    familyHistory: false,
+  } as T;
+
   const form = useForm<T>({
     mode: 'onChange', // Enable real-time validation
     reValidateMode: 'onChange',
-    defaultValues: {} as any,
+    defaultValues,
   });
 
   const { watch, formState: { errors, isValid }, setError, clearErrors } = form;

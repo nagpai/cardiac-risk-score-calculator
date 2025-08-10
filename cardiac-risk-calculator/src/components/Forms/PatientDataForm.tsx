@@ -3,6 +3,7 @@ import { useFormValidation } from '../../hooks/useFormValidation';
 import FormField from './FormField';
 import UnitSelector from './UnitSelector';
 import { Button } from '../UI';
+import { FormErrorBoundary } from '../ErrorBoundary';
 import type { PatientData } from '../../types';
 import { FORM_OPTIONS } from '../../utils/constants';
 import { 
@@ -141,85 +142,101 @@ const PatientDataForm: React.FC<PatientDataFormProps> = ({
       )}
 
       {/* Demographics Section */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
-          Demographics
-        </h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            {...register('age', getFieldValidationRules('age'))}
-            label="Age"
-            name="age"
-            type="number"
-            placeholder="Enter age (30-79)"
-            required
-            min={30}
-            max={79}
-            tooltip="Age must be between 30-79 years (Framingham study range)"
-            error={getFieldError('age')}
-            disabled={disabled}
-          />
+      <FormErrorBoundary onReset={() => reset()}>
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+            Demographics
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormErrorBoundary fieldName="age" onReset={() => setValue('age', 30)}>
+              <FormField
+                {...register('age', getFieldValidationRules('age'))}
+                label="Age"
+                name="age"
+                type="number"
+                placeholder="Enter age (30-79)"
+                required
+                min={30}
+                max={79}
+                tooltip="Age must be between 30-79 years (Framingham study range)"
+                error={getFieldError('age')}
+                disabled={disabled}
+              />
+            </FormErrorBoundary>
 
-          <FormField
-            {...register('gender', getFieldValidationRules('gender'))}
-            label="Gender"
-            name="gender"
-            type="select"
-            options={FORM_OPTIONS.GENDER}
-            required
-            tooltip="Biological sex assigned at birth"
-            error={getFieldError('gender')}
-            disabled={disabled}
-          />
+            <FormErrorBoundary fieldName="gender" onReset={() => setValue('gender', 'male')}>
+              <FormField
+                {...register('gender', getFieldValidationRules('gender'))}
+                label="Gender"
+                name="gender"
+                type="select"
+                options={FORM_OPTIONS.GENDER}
+                required
+                tooltip="Biological sex assigned at birth"
+                error={getFieldError('gender')}
+                disabled={disabled}
+              />
+            </FormErrorBoundary>
+          </div>
         </div>
-      </div>
+      </FormErrorBoundary>
 
       {/* Cholesterol Section */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
-          Cholesterol Levels
-        </h3>
+      <FormErrorBoundary onReset={() => {
+        setValue('totalCholesterol', 200);
+        setValue('hdlCholesterol', 50);
+        setValue('cholesterolUnit', 'mg/dL');
+      }}>
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
+            Cholesterol Levels
+          </h3>
 
-        <UnitSelector
-          label="Cholesterol Unit"
-          name="cholesterolUnit"
-          value={watch('cholesterolUnit') || 'mg/dL'}
-          options={FORM_OPTIONS.CHOLESTEROL_UNITS}
-          onChange={handleCholesterolUnitChange}
-          disabled={disabled}
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            {...register('totalCholesterol', getFieldValidationRules('totalCholesterol'))}
-            label="Total Cholesterol"
-            name="totalCholesterol"
-            type="number"
-            placeholder={`Enter total cholesterol`}
-            required
-            step={watch('cholesterolUnit') === 'mmol/L' ? 0.1 : 1}
-            unit={watch('cholesterolUnit')}
-            tooltip="Total cholesterol level from recent blood test"
-            error={getFieldError('totalCholesterol')}
+          <UnitSelector
+            label="Cholesterol Unit"
+            name="cholesterolUnit"
+            value={watch('cholesterolUnit') || 'mg/dL'}
+            options={FORM_OPTIONS.CHOLESTEROL_UNITS}
+            onChange={handleCholesterolUnitChange}
             disabled={disabled}
           />
 
-          <FormField
-            {...register('hdlCholesterol', getFieldValidationRules('hdlCholesterol'))}
-            label="HDL Cholesterol"
-            name="hdlCholesterol"
-            type="number"
-            placeholder={`Enter HDL cholesterol`}
-            required
-            step={watch('cholesterolUnit') === 'mmol/L' ? 0.1 : 1}
-            unit={watch('cholesterolUnit')}
-            tooltip="HDL (good) cholesterol level from recent blood test"
-            error={getFieldError('hdlCholesterol')}
-            disabled={disabled}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormErrorBoundary fieldName="totalCholesterol" onReset={() => setValue('totalCholesterol', 200)}>
+              <FormField
+                {...register('totalCholesterol', getFieldValidationRules('totalCholesterol'))}
+                label="Total Cholesterol"
+                name="totalCholesterol"
+                type="number"
+                placeholder={`Enter total cholesterol`}
+                required
+                step={watch('cholesterolUnit') === 'mmol/L' ? 0.1 : 1}
+                unit={watch('cholesterolUnit')}
+                tooltip="Total cholesterol level from recent blood test"
+                error={getFieldError('totalCholesterol')}
+                disabled={disabled}
+              />
+            </FormErrorBoundary>
+
+            <FormErrorBoundary fieldName="hdlCholesterol" onReset={() => setValue('hdlCholesterol', 50)}>
+              <FormField
+                {...register('hdlCholesterol', getFieldValidationRules('hdlCholesterol'))}
+                label="HDL Cholesterol"
+                name="hdlCholesterol"
+                type="number"
+                placeholder={`Enter HDL cholesterol`}
+                required
+                step={watch('cholesterolUnit') === 'mmol/L' ? 0.1 : 1}
+                unit={watch('cholesterolUnit')}
+                tooltip="HDL (good) cholesterol level from recent blood test"
+                error={getFieldError('hdlCholesterol')}
+                disabled={disabled}
+              />
+            </FormErrorBoundary>
+          </div>
         </div>
-      </div>
+      </FormErrorBoundary>
 
       {/* Blood Pressure Section */}
       <div className="space-y-4">

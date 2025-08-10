@@ -127,6 +127,27 @@ export interface ValidationError {
   field: string;
   message: string;
   value?: any;
+  code?: string;
+  severity?: 'error' | 'warning' | 'info';
+}
+
+export interface CalculationError extends Error {
+  code: 'INVALID_INPUT' | 'CALCULATION_FAILED' | 'ALGORITHM_ERROR' | 'BOUNDARY_VALUE' | 'MISSING_DATA';
+  context?: {
+    patientData?: Partial<PatientData>;
+    step?: string;
+    timestamp?: string;
+  };
+}
+
+export interface FormError extends Error {
+  code: 'VALIDATION_FAILED' | 'SUBMISSION_FAILED' | 'FIELD_ERROR' | 'FORM_STATE_ERROR';
+  field?: string;
+  context?: {
+    formData?: any;
+    fieldValue?: any;
+    timestamp?: string;
+  };
 }
 
 export type RiskCategory = 'low' | 'moderate' | 'high';

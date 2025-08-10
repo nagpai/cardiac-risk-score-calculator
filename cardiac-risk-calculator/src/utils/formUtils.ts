@@ -41,7 +41,7 @@ export const createDebouncedValidator = (
   validationFn: (value: any) => ValidationError | null,
   delay: number = 300
 ) => {
-  let timeoutId: number;
+  let timeoutId: NodeJS.Timeout;
   
   return (value: any, callback: (error: ValidationError | null) => void) => {
     clearTimeout(timeoutId);

@@ -1,6 +1,7 @@
 import type { PatientData, RiskResult, FraminghamCoefficients } from '../types';
 import { FRAMINGHAM_COEFFICIENTS, APP_CONFIG } from './constants';
 import { categorizeRisk, generateRecommendations } from './riskCategorization';
+import { withPerformanceMonitoring } from './performance';
 
 /**
  * Framingham Risk Score Calculator
@@ -12,9 +13,10 @@ import { categorizeRisk, generateRecommendations } from './riskCategorization';
  * @param patientData - Patient data with all required risk factors
  * @returns Risk result with percentage and detailed analysis
  */
-export function calculateFraminghamRisk(patientData: PatientData): RiskResult {
+export const calculateFraminghamRisk = withPerformanceMonitoring(
+  function calculateFraminghamRiskInternal(patientData: PatientData): RiskResult {
   try {
-    // Validate inputs first
+    // Comprehensive input validation
     const validationErrors = validateFraminghamInputs(patientData);
     if (validationErrors.length > 0) {
       throw new Error(`Validation failed: ${validationErrors.join(', ')}`);
@@ -23,22 +25,41 @@ export function calculateFraminghamRisk(patientData: PatientData): RiskResult {
     // Convert all values to standard units (mg/dL for cholesterol)
     const standardizedData = standardizeUnits(patientData);
     
-    // Check for NaN values after conversion
-    if (isNaN(standardizedData.totalCholesterol) || isNaN(standardizedData.hdlCholesterol)) {
-      throw new Error('Invalid cholesterol values after unit conversion');
-    }
+    // Comprehensive validation after unit conversion
+    validateStandardizedData(standardizedData);
     
     // Get gender-specific coefficients
     const coefficients = FRAMINGHAM_COEFFICIENTS[patientData.gender];
+    if (!coefficients) {
+      throw new Error(`Invalid gender: ${patientData.gender}`);
+    }
     
-    // Calculate individual risk factor scores
+    // Calculate individual risk factor scores with error handling
     const riskFactors = calculateRiskFactorScores(standardizedData, coefficients);
     
+    // Validate risk factor scores
+    validateRiskFactorScores(riskFactors);
+    
     // Calculate total risk score
-    const totalScore = Object.values(riskFactors).reduce((sum, score) => sum + score, 0);
+    const totalScore = Object.values(riskFactors).reduce((sum, score) => {
+      if (!isFinite(score)) {
+        throw new Error(`Invalid risk factor score: ${score}`);
+      }
+      return sum + score;
+    }, 0);
+    
+    // Validate total score
+    if (!isFinite(totalScore)) {
+      throw new Error(`Invalid total risk score: ${totalScore}`);
+    }
     
     // Convert score to 10-year risk percentage
     const tenYearRisk = convertScoreToRiskPercentage(totalScore, patientData.gender);
+    
+    // Validate final risk percentage
+    if (!isFinite(tenYearRisk) || tenYearRisk < 0 || tenYearRisk > 100) {
+      throw new Error(`Invalid risk percentage calculated: ${tenYearRisk}`);
+    }
     
     // Generate comparison data
     const comparisonData = generateComparisonData(patientData);
@@ -59,7 +80,7 @@ export function calculateFraminghamRisk(patientData: PatientData): RiskResult {
   } catch (error) {
     throw new Error(`Framingham risk calculation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-}
+}, 'risk-calculation');
 
 /**
  * Standardizes patient data units to mg/dL for cholesterol calculations
@@ -237,6 +258,67 @@ export function validateFraminghamInputs(patientData: PatientData): string[] {
   }
   
   return errors;
+}
+
+/**
+ * Validates standardized data after unit conversion
+ */
+function validateStandardizedData(data: PatientData): void {
+  // Check for NaN values after conversion
+  if (isNaN(data.totalCholesterol) || isNaN(data.hdlCholesterol)) {
+    throw new Error('Invalid cholesterol values after unit conversion');
+  }
+  
+  if (isNaN(data.systolicBP) || isNaN(data.diastolicBP)) {
+    throw new Error('Invalid blood pressure values');
+  }
+  
+  if (isNaN(data.age)) {
+    throw new Error('Invalid age value');
+  }
+  
+  // Check for infinite values
+  if (!isFinite(data.totalCholesterol) || !isFinite(data.hdlCholesterol)) {
+    throw new Error('Cholesterol values must be finite numbers');
+  }
+  
+  if (!isFinite(data.systolicBP) || !isFinite(data.diastolicBP)) {
+    throw new Error('Blood pressure values must be finite numbers');
+  }
+  
+  // Check for extreme values that would break the calculation
+  if (data.totalCholesterol > 1000 || data.hdlCholesterol > 200) {
+    throw new Error('Cholesterol values are outside calculable range');
+  }
+  
+  if (data.systolicBP > 300 || data.diastolicBP > 200) {
+    throw new Error('Blood pressure values are outside calculable range');
+  }
+  
+  // Check for logical consistency
+  if (data.hdlCholesterol >= data.totalCholesterol) {
+    throw new Error('HDL cholesterol cannot be higher than or equal to total cholesterol');
+  }
+  
+  if (data.diastolicBP >= data.systolicBP) {
+    throw new Error('Diastolic blood pressure must be lower than systolic blood pressure');
+  }
+}
+
+/**
+ * Validates calculated risk factor scores
+ */
+function validateRiskFactorScores(riskFactors: Record<string, number>): void {
+  for (const [factor, score] of Object.entries(riskFactors)) {
+    if (!isFinite(score)) {
+      throw new Error(`Invalid risk factor score for ${factor}: ${score}`);
+    }
+    
+    // Check for extremely high scores that might indicate calculation errors
+    if (Math.abs(score) > 50) {
+      throw new Error(`Risk factor score for ${factor} is outside expected range: ${score}`);
+    }
+  }
 }
 
 /**

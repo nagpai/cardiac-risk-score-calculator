@@ -8,3 +8,5 @@ export * from './validation';
 export * from './formUtils';
 export * from './storage';
 export * from './accessibility';
+export * from './performance';
+export * from './devicePerformance';

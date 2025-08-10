@@ -1,7 +1,19 @@
 
-import React from 'react';
-import { RiskCalculator } from './components/Calculator';
+
+import { lazy, Suspense } from 'react';
 import { AccessibilityProvider, AccessibilityToolbar } from './components/Accessibility';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { LoadingSpinner } from './components/UI';
+import { RiskCalculator as DirectRiskCalculator } from './components/Calculator';
+
+// Lazy load the main calculator component for code splitting
+const LazyRiskCalculator = lazy(() => 
+  import('./components/Calculator').then(module => ({ default: module.RiskCalculator }))
+);
+
+// Use direct import in test mode, lazy loading in production
+const isTest = import.meta.env.MODE === 'test' || process.env.NODE_ENV === 'test';
+const RiskCalculator = isTest ? DirectRiskCalculator : LazyRiskCalculator;
 
 function App() {
   return (
@@ -61,7 +73,28 @@ function App() {
           tabIndex={-1}
         >
           <div className="px-4 py-6 sm:px-0">
-            <RiskCalculator />
+            <ErrorBoundary
+              onError={(error, errorInfo) => {
+                console.error('Application error:', error, errorInfo);
+                // In a real app, you would send this to an error reporting service
+              }}
+              resetOnPropsChange={true}
+              resetKeys={[window.location.pathname]}
+            >
+              {isTest ? (
+                <RiskCalculator />
+              ) : (
+                <Suspense 
+                  fallback={
+                    <div className="flex justify-center items-center min-h-96">
+                      <LoadingSpinner size="lg" />
+                    </div>
+                  }
+                >
+                  <RiskCalculator />
+                </Suspense>
+              )}
+            </ErrorBoundary>
           </div>
         </main>
         
