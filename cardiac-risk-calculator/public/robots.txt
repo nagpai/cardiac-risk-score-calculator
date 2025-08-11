@@ -1,0 +1,20 @@
+# Robots.txt for Cardiac Risk Calculator
+# This is a medical educational tool
+
+User-agent: *
+# Allow indexing of main pages for educational purposes
+Allow: /
+Allow: /index.html
+
+# Disallow sensitive or unnecessary paths
+Disallow: /assets/
+Disallow: /*.js$
+Disallow: /*.css$
+Disallow: /*.map$
+Disallow: /health
+
+# Sitemap (if applicable)
+# Sitemap: https://your-domain.com/sitemap.xml
+
+# Crawl delay for medical content (be respectful)
+Crawl-delay: 1

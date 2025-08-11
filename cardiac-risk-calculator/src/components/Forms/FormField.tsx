@@ -100,7 +100,7 @@ const FormField = forwardRef<HTMLInputElement | HTMLSelectElement, ExtendedFormF
             ref={ref as React.Ref<HTMLSelectElement>}
             id={fieldId}
             name={name}
-            value={String(value || '')}
+            value={value !== undefined && value !== null ? String(value) : ''}
             onChange={onChange}
             onBlur={onBlur}
             disabled={disabled}
@@ -192,7 +192,7 @@ const FormField = forwardRef<HTMLInputElement | HTMLSelectElement, ExtendedFormF
           type={type}
           id={fieldId}
           name={name}
-          value={String(value || '')}
+          value={value !== undefined && value !== null ? String(value) : ''}
           onChange={onChange}
           onBlur={onBlur}
           placeholder={placeholder}

@@ -647,10 +647,26 @@ export const validateField = (
 
 /**
  * Checks if patient data is complete and valid for calculation
+ * Only considers actual errors, not warnings or info messages
  */
 export const isPatientDataComplete = (data: Partial<PatientData>): boolean => {
+  // First check if all required fields are present
+  const requiredFields = [
+    'age', 'gender', 'totalCholesterol', 'hdlCholesterol', 
+    'systolicBP', 'diastolicBP', 'smokingStatus'
+  ];
+  
+  for (const field of requiredFields) {
+    const value = data[field as keyof PatientData];
+    if (value === undefined || value === null || value === '') {
+      return false;
+    }
+  }
+  
+  // Then check for validation errors (excluding warnings)
   const errors = validatePatientData(data);
-  return errors.length === 0;
+  const actualErrors = errors.filter(error => error.severity === 'error');
+  return actualErrors.length === 0;
 };
 
 /**

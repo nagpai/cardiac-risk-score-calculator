@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
 
 // https://vite.dev/config/
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
   const env = loadEnv(mode, process.cwd(), '')
   
@@ -13,10 +13,7 @@ export default defineConfig(({ command, mode }) => {
 
   return {
     plugins: [
-      react({
-        // Enable React Fast Refresh in development
-        fastRefresh: !isProduction,
-      }),
+      react(),
       // Bundle analyzer - only in development or when explicitly enabled
       ...(enableAnalyzer ? [
         visualizer({
@@ -66,6 +63,8 @@ export default defineConfig(({ command, mode }) => {
           chunkFileNames: 'assets/js/[name]-[hash].js',
           entryFileNames: 'assets/js/[name]-[hash].js',
         },
+        // External dependencies (if any CDN usage is desired)
+        external: isProduction ? [] : [],
       },
       
       // Optimize chunk size warnings
@@ -80,9 +79,14 @@ export default defineConfig(({ command, mode }) => {
         compress: {
           drop_console: true, // Remove console.log in production
           drop_debugger: true,
+          pure_funcs: ['console.log', 'console.info', 'console.debug'],
+          passes: 2,
         },
         mangle: {
           safari10: true,
+        },
+        format: {
+          comments: false,
         },
       } : undefined,
       
@@ -94,6 +98,22 @@ export default defineConfig(({ command, mode }) => {
       
       // Report compressed file sizes
       reportCompressedSize: isProduction,
+      
+      // Optimize asset inlining
+      assetsInlineLimit: 4096,
+      
+      // Enable/disable asset hashing
+      assetsDir: 'assets',
+      
+      // Production-specific optimizations
+      ...(isProduction && {
+        // Enable polyfill detection
+        polyfillModulePreload: true,
+        // Optimize module preload
+        modulePreload: {
+          polyfill: true,
+        },
+      }),
     },
 
     // Performance optimizations
@@ -114,8 +134,6 @@ export default defineConfig(({ command, mode }) => {
       port: 3000,
       open: true,
       cors: true,
-      // Enable HTTP/2 in development
-      https: false,
     },
 
     // Preview server configuration
@@ -127,14 +145,11 @@ export default defineConfig(({ command, mode }) => {
 
     // CSS configuration
     css: {
-      // Enable CSS modules
+      // Enable CSS modules for .module.css files only
       modules: {
         localsConvention: 'camelCase',
       },
-      // PostCSS configuration
-      postcss: {
-        plugins: [],
-      },
+      // PostCSS configuration will use postcss.config.js
     },
 
     // Environment variables prefix

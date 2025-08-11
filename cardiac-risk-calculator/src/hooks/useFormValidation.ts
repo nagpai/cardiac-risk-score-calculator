@@ -13,18 +13,18 @@ import {
  */
 export const useFormValidation = <T extends Record<string, any> = PatientData>() => {
   const defaultValues = {
+    // Only set defaults for non-required fields
     cholesterolUnit: 'mg/dL',
-    onBPMedication: false,
     glucoseUnit: 'mg/dL',
-    smokingStatus: 'never',
+    onBPMedication: false,
     hasDiabetes: false,
     familyHistory: false,
-  } as T;
+  };
 
   const form = useForm<T>({
     mode: 'onChange', // Enable real-time validation
     reValidateMode: 'onChange',
-    defaultValues,
+    defaultValues: defaultValues as any,
   });
 
   const { watch, formState: { errors, isValid }, setError, clearErrors } = form;

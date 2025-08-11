@@ -104,8 +104,26 @@ const PatientDataForm: React.FC<PatientDataFormProps> = ({
     
     const completedFields = requiredFields.filter(field => {
       const value = formData[field as keyof PatientData];
-      return value !== undefined && value !== null && String(value) !== '';
+      
+      // Simple and explicit check
+      if (value === null || value === undefined || value === '') {
+        return false;
+      }
+      
+      // For string values, check if not empty after trimming
+      if (typeof value === 'string' && value.trim() === '') {
+        return false;
+      }
+      
+      // For number values, check if it's a valid number and not 0
+      if (typeof value === 'number' && (isNaN(value) || value === 0)) {
+        return false;
+      }
+      
+      return true;
     });
+
+
 
     return {
       completed: completedFields.length,
@@ -151,7 +169,6 @@ const PatientDataForm: React.FC<PatientDataFormProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormErrorBoundary fieldName="age" onReset={() => setValue('age', 30)}>
               <FormField
-                {...register('age', getFieldValidationRules('age'))}
                 label="Age"
                 name="age"
                 type="number"
@@ -162,12 +179,13 @@ const PatientDataForm: React.FC<PatientDataFormProps> = ({
                 tooltip="Age must be between 30-79 years (Framingham study range)"
                 error={getFieldError('age')}
                 disabled={disabled}
+                value={watch('age') || ''}
+                {...register('age', getFieldValidationRules('age'))}
               />
             </FormErrorBoundary>
 
             <FormErrorBoundary fieldName="gender" onReset={() => setValue('gender', 'male')}>
               <FormField
-                {...register('gender', getFieldValidationRules('gender'))}
                 label="Gender"
                 name="gender"
                 type="select"
@@ -176,6 +194,8 @@ const PatientDataForm: React.FC<PatientDataFormProps> = ({
                 tooltip="Biological sex assigned at birth"
                 error={getFieldError('gender')}
                 disabled={disabled}
+                value={watch('gender') || ''}
+                {...register('gender', getFieldValidationRules('gender'))}
               />
             </FormErrorBoundary>
           </div>
@@ -205,7 +225,6 @@ const PatientDataForm: React.FC<PatientDataFormProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormErrorBoundary fieldName="totalCholesterol" onReset={() => setValue('totalCholesterol', 200)}>
               <FormField
-                {...register('totalCholesterol', getFieldValidationRules('totalCholesterol'))}
                 label="Total Cholesterol"
                 name="totalCholesterol"
                 type="number"
@@ -216,12 +235,13 @@ const PatientDataForm: React.FC<PatientDataFormProps> = ({
                 tooltip="Total cholesterol level from recent blood test"
                 error={getFieldError('totalCholesterol')}
                 disabled={disabled}
+                value={watch('totalCholesterol') || ''}
+                {...register('totalCholesterol', getFieldValidationRules('totalCholesterol'))}
               />
             </FormErrorBoundary>
 
             <FormErrorBoundary fieldName="hdlCholesterol" onReset={() => setValue('hdlCholesterol', 50)}>
               <FormField
-                {...register('hdlCholesterol', getFieldValidationRules('hdlCholesterol'))}
                 label="HDL Cholesterol"
                 name="hdlCholesterol"
                 type="number"
@@ -232,6 +252,8 @@ const PatientDataForm: React.FC<PatientDataFormProps> = ({
                 tooltip="HDL (good) cholesterol level from recent blood test"
                 error={getFieldError('hdlCholesterol')}
                 disabled={disabled}
+                value={watch('hdlCholesterol') || ''}
+                {...register('hdlCholesterol', getFieldValidationRules('hdlCholesterol'))}
               />
             </FormErrorBoundary>
           </div>
@@ -246,7 +268,6 @@ const PatientDataForm: React.FC<PatientDataFormProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
-            {...register('systolicBP', getFieldValidationRules('systolicBP'))}
             label="Systolic Blood Pressure"
             name="systolicBP"
             type="number"
@@ -258,10 +279,11 @@ const PatientDataForm: React.FC<PatientDataFormProps> = ({
             tooltip="The top number in your blood pressure reading"
             error={getFieldError('systolicBP')}
             disabled={disabled}
+            value={watch('systolicBP') || ''}
+            {...register('systolicBP', getFieldValidationRules('systolicBP'))}
           />
 
           <FormField
-            {...register('diastolicBP', getFieldValidationRules('diastolicBP'))}
             label="Diastolic Blood Pressure"
             name="diastolicBP"
             type="number"
@@ -273,6 +295,8 @@ const PatientDataForm: React.FC<PatientDataFormProps> = ({
             tooltip="The bottom number in your blood pressure reading"
             error={getFieldError('diastolicBP')}
             disabled={disabled}
+            value={watch('diastolicBP') || ''}
+            {...register('diastolicBP', getFieldValidationRules('diastolicBP'))}
           />
         </div>
 
@@ -281,8 +305,9 @@ const PatientDataForm: React.FC<PatientDataFormProps> = ({
           type="checkbox"
           tooltip="Check if you are currently taking medication to control blood pressure"
           disabled={disabled}
-          value={watch('onBPMedication')}
-          {...register('onBPMedication')}
+          value={watch('onBPMedication') || false}
+          name="onBPMedication"
+          onChange={(e) => setValue('onBPMedication', e.target.checked)}
         />
       </div>
 
@@ -300,8 +325,9 @@ const PatientDataForm: React.FC<PatientDataFormProps> = ({
           tooltip="Your current or past smoking history"
           error={getFieldError('smokingStatus')}
           disabled={disabled}
-          value={watch('smokingStatus')}
-          {...register('smokingStatus', getFieldValidationRules('smokingStatus'))}
+          value={watch('smokingStatus') || ''}
+          name="smokingStatus"
+          onChange={(e) => setValue('smokingStatus', e.target.value)}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -310,8 +336,9 @@ const PatientDataForm: React.FC<PatientDataFormProps> = ({
             type="checkbox"
             tooltip="Check if you have been diagnosed with diabetes (Type 1 or Type 2)"
             disabled={disabled}
-            value={watch('hasDiabetes')}
-            {...register('hasDiabetes')}
+            value={watch('hasDiabetes') || false}
+            name="hasDiabetes"
+            onChange={(e) => setValue('hasDiabetes', e.target.checked)}
           />
 
           <FormField
@@ -319,8 +346,9 @@ const PatientDataForm: React.FC<PatientDataFormProps> = ({
             type="checkbox"
             tooltip="Check if you have immediate family members with heart disease"
             disabled={disabled}
-            value={watch('familyHistory')}
-            {...register('familyHistory')}
+            value={watch('familyHistory') || false}
+            name="familyHistory"
+            onChange={(e) => setValue('familyHistory', e.target.checked)}
           />
         </div>
       </div>
@@ -341,7 +369,6 @@ const PatientDataForm: React.FC<PatientDataFormProps> = ({
         />
 
         <FormField
-          {...register('bloodGlucose', getFieldValidationRules('bloodGlucose'))}
           label="Blood Glucose"
           name="bloodGlucose"
           type="number"
@@ -351,6 +378,8 @@ const PatientDataForm: React.FC<PatientDataFormProps> = ({
           tooltip="Fasting blood glucose level (optional but helpful for risk assessment)"
           error={getFieldError('bloodGlucose')}
           disabled={disabled}
+          value={watch('bloodGlucose') || ''}
+          {...register('bloodGlucose', getFieldValidationRules('bloodGlucose'))}
         />
       </div>
 
