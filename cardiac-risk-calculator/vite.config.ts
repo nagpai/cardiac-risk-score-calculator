@@ -39,6 +39,11 @@ export default defineConfig(({ mode }) => {
       
       // Enable code splitting
       rollupOptions: {
+        // Force Rollup to use JS version instead of native
+        ...(isProduction && {
+          external: [],
+          plugins: []
+        }),
         output: {
           // Manual chunks for better caching
           manualChunks: {
@@ -63,8 +68,6 @@ export default defineConfig(({ mode }) => {
           chunkFileNames: 'assets/js/[name]-[hash].js',
           entryFileNames: 'assets/js/[name]-[hash].js',
         },
-        // External dependencies (if any CDN usage is desired)
-        external: isProduction ? [] : [],
       },
       
       // Optimize chunk size warnings

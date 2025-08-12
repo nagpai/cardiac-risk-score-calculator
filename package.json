@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build:production": "cd cardiac-risk-calculator && npm ci --force && ROLLUP_NO_NATIVE=1 npm run build:prod",
+    "build:production": "cd cardiac-risk-calculator && rm -rf node_modules package-lock.json && npm install && npm run build:prod",
     "build": "cd cardiac-risk-calculator && npm install --no-save && npm run build",
     "install:deps": "cd cardiac-risk-calculator && npm install",
     "dev": "cd cardiac-risk-calculator && npm run dev",
