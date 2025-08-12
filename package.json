@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build:production": "cd cardiac-risk-calculator && npm ci && npm run build:prod",
-    "build": "cd cardiac-risk-calculator && npm ci && npm run build",
-    "install": "cd cardiac-risk-calculator && npm ci"
+    "build:production": "cd cardiac-risk-calculator && npm install --no-save && npm run build:prod",
+    "build": "cd cardiac-risk-calculator && npm install --no-save && npm run build",
+    "install:deps": "cd cardiac-risk-calculator && npm install",
+    "dev": "cd cardiac-risk-calculator && npm run dev",
+    "preview": "cd cardiac-risk-calculator && npm run preview"
   },
   "workspaces": [
     "cardiac-risk-calculator"
