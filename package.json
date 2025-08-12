@@ -1,0 +1,13 @@
+{
+  "name": "cardiac-risk-calculator-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:production": "cd cardiac-risk-calculator && npm ci && npm run build:prod",
+    "build": "cd cardiac-risk-calculator && npm ci && npm run build",
+    "install": "cd cardiac-risk-calculator && npm ci"
+  },
+  "workspaces": [
+    "cardiac-risk-calculator"
+  ]
+}
