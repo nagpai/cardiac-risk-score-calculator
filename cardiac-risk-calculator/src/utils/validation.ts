@@ -658,7 +658,12 @@ export const isPatientDataComplete = (data: Partial<PatientData>): boolean => {
   
   for (const field of requiredFields) {
     const value = data[field as keyof PatientData];
-    if (value === undefined || value === null || value === '') {
+    if (value === undefined || value === null) {
+      return false;
+    }
+    
+    // Check for empty string (cast to string first)
+    if (String(value) === '') {
       return false;
     }
   }
