@@ -33,40 +33,25 @@ export default defineConfig(({ mode }) => {
       __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
     },
 
+    // Force esbuild instead of rollup for production builds
+    esbuild: isProduction ? {
+      target: 'es2020',
+      minify: true,
+      treeShaking: true,
+    } : undefined,
+
     build: {
       // Target modern browsers for better performance
       target: 'es2020',
       
-      // Enable code splitting
+      // Simplified rollup options - avoid complex chunking that can cause native binary issues
       rollupOptions: {
-        // Force Rollup to use JS version instead of native
-        ...(isProduction && {
-          external: [],
-          plugins: []
-        }),
         output: {
-          // Manual chunks for better caching
-          manualChunks: {
-            // Vendor chunk for React and related libraries
-            vendor: ['react', 'react-dom'],
-            // Chart.js and related libraries
-            charts: ['chart.js', 'react-chartjs-2'],
-            // Form handling libraries
-            forms: ['react-hook-form'],
-          },
-          // Optimize asset file names for caching
-          assetFileNames: (assetInfo) => {
-            const info = assetInfo.name?.split('.') || []
-            let extType = info[info.length - 1]
-            if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
-              extType = 'img'
-            } else if (/woff|woff2|eot|ttf|otf/i.test(extType)) {
-              extType = 'fonts'
-            }
-            return `assets/${extType}/[name]-[hash][extname]`
-          },
-          chunkFileNames: 'assets/js/[name]-[hash].js',
-          entryFileNames: 'assets/js/[name]-[hash].js',
+          // Disable manual chunking to avoid rollup native binary issues
+          manualChunks: undefined,
+          assetFileNames: 'assets/[name]-[hash][extname]',
+          chunkFileNames: 'assets/[name]-[hash].js',
+          entryFileNames: 'assets/[name]-[hash].js',
         },
       },
       
@@ -76,22 +61,8 @@ export default defineConfig(({ mode }) => {
       // Source maps based on environment
       sourcemap: enableSourcemap,
       
-      // Minification settings
-      minify: isProduction ? 'terser' : false,
-      terserOptions: isProduction ? {
-        compress: {
-          drop_console: true, // Remove console.log in production
-          drop_debugger: true,
-          pure_funcs: ['console.log', 'console.info', 'console.debug'],
-          passes: 2,
-        },
-        mangle: {
-          safari10: true,
-        },
-        format: {
-          comments: false,
-        },
-      } : undefined,
+      // Use esbuild for minification to avoid rollup native binary issues
+      minify: isProduction ? 'esbuild' : false,
       
       // CSS code splitting
       cssCodeSplit: true,
