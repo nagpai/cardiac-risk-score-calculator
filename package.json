@@ -8,7 +8,7 @@
     "install:deps": "cd cardiac-risk-calculator && npm install",
     "dev": "cd cardiac-risk-calculator && npm run dev",
     "preview": "cd cardiac-risk-calculator && npm run preview",
-    "deploy": "npm run build:production && npx wrangler deploy --assets=cardiac-risk-calculator/dist"
+    "deploy": "npm run build:production && npx wrangler deploy --env=\"\""
   },
   "workspaces": [
     "cardiac-risk-calculator"

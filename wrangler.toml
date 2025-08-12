@@ -1,9 +1,0 @@
-name = "cardiac-risk-calculator"
-compatibility_date = "2025-08-12"
-
-[env.production]
-name = "cardiac-risk-calculator"
-
-# Static site configuration
-[assets]
-directory = "cardiac-risk-calculator/dist"
